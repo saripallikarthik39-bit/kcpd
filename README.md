@@ -1,32 +1,25 @@
-# React + TypeScript + Vite
+# Kirana Store Ambient Counter Co-Pilot
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Offline-first voice counter co-pilot for Indian micro-merchants (billing, customer khata, inventory, and simulated UPI checks).
 
-Currently, two official plugins are available:
+## Quick Start (Person 1 Setup)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
-
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the Oxlint configuration
-
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `tsrs` and editing `.oxlintrc.json`:
-
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+```bash
+npm install
+npm run dev
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+Open the local URL printed by Vite (default: `http://localhost:5173`).
+
+## Shared Data Contract (For Person 2 & Person 3)
+
+- **Shared TypeScript interfaces:** `src/types/store.ts` (`Product`, `Customer`, `LineItem`, `KhataTransaction`, `UpiEvent`, `Bill`)
+- **Offline Database (Dexie.js / IndexedDB):** `src/db/database.ts` (`db.products`, `db.customers`, `db.khata_transactions`, `db.upi_events`, `db.bills`)
+- **Seed Data & Reset Helper:** `src/db/seed.ts` (9 SKUs with Hinglish/Telugu aliases, 3 fictional Khata customers, 2 initial simulated UPI events)
+- **Offline Mutation Queue:** `src/db/offlineQueue.ts` (`addKhataEntry` with `client_tx_id` deduplication, `flushOfflineQueue`)
+
+## Team Roles
+
+- **Person 1:** App shell, dark fintech Counter HUD, and offline Dexie.js data layer
+- **Person 2:** Voice engine and AI intent/tool routing (`src/engine/`)
+- **Person 3:** Simulated UPI payment generator and end-to-end integration (`src/p3/`)
