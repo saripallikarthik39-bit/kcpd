@@ -5,7 +5,7 @@ A voice assistant concept for helping kirana shopkeepers with everyday store tas
 
 ## First demo
 
-- Calculate a quick bill
+- Calculate  quick bill
 - Record a customer khata entry
 - Check sample inventory
 - Show simulated payment events for demonstration
