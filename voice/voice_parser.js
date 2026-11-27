@@ -260,7 +260,7 @@ function processVoiceCommand(rawTranscript) {
       checks: checks,
       product_name: items.length > 0 ? items[0].product_name : null
     };
-    spoken = "Checking " + checks.join(" and ") + " status.";
+    spoken = "Checking " + checks.join(" and ").replace(/_/g, " ") + " status.";
   } else if (intent === "get_wholesale_rate") {
     const target = items.length > 0 ? items[0].product_name : null;
     entities = { product_name: target, discreet: true };
