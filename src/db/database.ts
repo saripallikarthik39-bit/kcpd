@@ -28,21 +28,29 @@ export class KiranaDB extends Dexie {
 
 export const db = new KiranaDB();
 
-export async function initDatabaseWithRecovery(seedFn: () => Promise<void>): Promise<void> {
-  try {
-    await db.open();
-    const productCount = await db.products.count();
-    if (productCount === 0) {
-      await seedFn();
-    }
-  } catch (err: unknown) {
-    const errorName = err instanceof Error ? err.name : '';
-    if (errorName === 'UpgradeError' || errorName === 'VersionError') {
-      await Dexie.delete('KiranaCopilotDB');
-      await db.open();
-      await seedFn();
-    } else {
-      throw err;
-    }
+let initPromise: Promise<void> | null = null;
+
+export function initDatabaseWithRecovery(seedFn: () => Promise<void>): Promise<void> {
+  if (!initPromise) {
+    initPromise = (async () => {
+      try {
+        await db.open();
+        const productCount = await db.products.count();
+        if (productCount === 0) {
+          await seedFn();
+        }
+      } catch (err: unknown) {
+        const errorName = err instanceof Error ? err.name : '';
+        if (errorName === 'UpgradeError' || errorName === 'VersionError') {
+          await Dexie.delete('KiranaCopilotDB');
+          await db.open();
+          await seedFn();
+        } else {
+          initPromise = null;
+          throw err;
+        }
+      }
+    })();
   }
+  return initPromise;
 }
