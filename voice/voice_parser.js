@@ -37,6 +37,8 @@ const WORD_NUMBERS = {
   teen: "3"
 };
 
+let txCounter = 0;
+
 function cleanTranscript(raw) {
   let text = String(raw || "").toLowerCase();
 
@@ -203,7 +205,7 @@ function processVoiceCommand(rawTranscript) {
     entities = {
       customer_name: customer,
       items: items,
-      client_tx_id: "tx_" + Date.now()
+      client_tx_id: "tx_" + Date.now() + "_" + (++txCounter)
     };
 
     if (!customer) {
