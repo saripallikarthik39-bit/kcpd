@@ -1,21 +1,32 @@
+# React + TypeScript + Vite
 
-# Kirana Store Ambient Voice Co-Pilot
+This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
 
-A voice assistant concept for helping kirana shopkeepers with everyday store tasks.
+Currently, two official plugins are available:
 
-## First demo
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
 
-- Calculate  quick bill
-- Record a customer khata entry
-- Check sample inventory
-- Show simulated payment events for demonstration
+## React Compiler
 
-## Team
+The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
 
-- Person 1: App and local data
-- Person 2: Voice and AI
-- Person 3: Payment simulator and integration
+## Expanding the Oxlint configuration
 
-## Project status
+If you are developing a production application, we recommend enabling type-aware lint rules by installing `tsrs` and editing `.oxlintrc.json`:
 
-Early prototype. Payment events are simulated for the demo.
+```json
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["react", "typescript", "oxc"],
+  "options": {
+    "typeAware": true
+  },
+  "rules": {
+    "react/rules-of-hooks": "error",
+    "react/only-export-components": ["warn", { "allowConstantExport": true }]
+  }
+}
+```
+
+See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
