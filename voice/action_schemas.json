@@ -1,0 +1,78 @@
+{
+  "version": "1.0",
+  "owner": "Person 2 - Voice and AI",
+  "shared_units": ["kg", "L", "pack", "pouch"],
+  "response_envelope": {
+    "required": [
+      "raw_transcript",
+      "cleaned_transcript",
+      "parsed_intent",
+      "status",
+      "entities",
+      "latency_ms",
+      "spoken_response",
+      "fallback_text",
+      "error_code"
+    ],
+    "status_values": ["valid", "needs_clarification", "error"]
+  },
+  "actions": {
+    "calculate_quick_bill": {
+      "required_fields": ["items"],
+      "item_schema": {
+        "product_name": "string (must match catalog)",
+        "quantity": "number (> 0)",
+        "unit": "string (kg | L | pack | pouch)",
+        "override_unit_price": "number | null"
+      },
+      "optional_fields": ["counter_slot (Counter A | Counter B)"],
+      "error_codes": ["NO_ITEMS_FOUND", "UNKNOWN_PRODUCT", "INVALID_QUANTITY"]
+    },
+    "log_khata": {
+      "required_fields": ["customer_name", "items", "client_tx_id"],
+      "item_schema": {
+        "product_name": "string (must match catalog)",
+        "quantity": "number (> 0)",
+        "unit": "string (kg | L | pack | pouch)"
+      },
+      "validation_rules": [
+        "Never write to storage if customer_name is missing",
+        "Reject zero, negative, or out-of-stock quantities",
+        "Use client_tx_id to prevent duplicate writes during offline sync"
+      ],
+      "error_codes": ["MISSING_CUSTOMER", "NO_ITEMS_FOUND", "UNKNOWN_PRODUCT", "INVALID_QUANTITY", "OUT_OF_STOCK"]
+    },
+    "check_inventory": {
+      "required_fields": ["checks"],
+      "allowed_checks": ["low_stock", "expiring_soon", "item_stock", "log_expiry"],
+      "optional_fields": ["product_name", "expiry_date"],
+      "error_codes": ["UNKNOWN_PRODUCT"]
+    },
+    "verify_upi_payment": {
+      "required_fields": ["sender", "amount"],
+      "optional_fields": ["app (PhonePe | GPay | Paytm)"],
+      "validation_rules": [
+        "Check events received in the last 5 minutes",
+        "Never auto-deduct khata; return 1-tap confirmation flag only",
+        "Trigger Fraud Alert if no VERIFIED event matches sender and amount"
+      ],
+      "error_codes": ["MISSING_SENDER", "MISSING_AMOUNT"]
+    },
+    "get_wholesale_rate": {
+      "required_fields": ["product_name"],
+      "output_flags": {
+        "discreet": true,
+        "floor_price_formula": "Math.ceil(wholesale_cost * 1.08)"
+      },
+      "error_codes": ["UNKNOWN_PRODUCT"]
+    },
+    "send_whatsapp_reminder": {
+      "required_fields": ["customer_name"],
+      "validation_rules": [
+        "Draft URL-encoded wa.me message only",
+        "Never auto-send without shopkeeper tap"
+      ],
+      "error_codes": ["MISSING_CUSTOMER"]
+    }
+  }
+}
