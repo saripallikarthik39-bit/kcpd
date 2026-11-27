@@ -1,0 +1,126 @@
+{
+  "version": "1.0",
+  "owner": "Person 2 - Voice and AI",
+  "notes": "Code-mixed English, Hindi, and Telugu phrases with fractions, typos, and self-corrections.",
+  "actions": {
+    "calculate_quick_bill": [
+      {
+        "phrase": "250g jeera at 400/kg and 3 Maggi",
+        "language": "en-IN",
+        "tests": ["fractional_weight", "price_override", "multi_item"]
+      },
+      {
+        "phrase": "Aadha kilo chini aur 2 packet Good Day ka bill banao",
+        "language": "hi-en",
+        "tests": ["hindi_fraction", "hindi_alias"]
+      },
+      {
+        "phrase": "Oka kilo panchadara, rendhu packet Maggi total entha?",
+        "language": "te-en",
+        "tests": ["telugu_number", "telugu_alias"]
+      }
+    ],
+    "log_khata": [
+      {
+        "phrase": "Uh, add 2 kg sugar, actually 3, and 1 Surf Excel to Sharma ji's khata",
+        "language": "en-IN",
+        "tests": ["filler_word", "self_correction", "multi_item"]
+      },
+      {
+        "phrase": "Ramesh ke khate mein 1 liter doodh aur paav kilo tour dal likh do",
+        "language": "hi-en",
+        "tests": ["hindi_alias", "hindi_fraction", "phonetic_typo"]
+      },
+      {
+        "phrase": "Suresh khata lo 1 liter paalu, 1 Sunflower Oil add cheyyi",
+        "language": "te-en",
+        "tests": ["telugu_alias", "code_mixed"]
+      }
+    ],
+    "check_inventory": [
+      {
+        "phrase": "Check low stock and expiry",
+        "language": "en-IN",
+        "tests": ["combined_check"]
+      },
+      {
+        "phrase": "Kal kya expire ho raha hai aur jira kitna bacha hai?",
+        "language": "hi-en",
+        "tests": ["expiry_check", "phonetic_typo"]
+      },
+      {
+        "phrase": "Stock lo em takkuva undi, paalu eppudu expire avutundi?",
+        "language": "te-en",
+        "tests": ["telugu_low_stock", "telugu_alias"]
+      }
+    ],
+    "verify_upi_payment": [
+      {
+        "phrase": "Did 340 come from Suresh?",
+        "language": "en-IN",
+        "tests": ["p3_demo_fraud_to_verified"]
+      },
+      {
+        "phrase": "Suresh ne PhonePe pe 340 bheje kya?",
+        "language": "hi-en",
+        "tests": ["hindi_upi_check", "app_name"]
+      },
+      {
+        "phrase": "Suresh nunchi 340 rupees vachaya?",
+        "language": "te-en",
+        "tests": ["telugu_upi_check"]
+      }
+    ],
+    "get_wholesale_rate": [
+      {
+        "phrase": "Buying rate for Toor Dal?",
+        "language": "en-IN",
+        "tests": ["discreet_margin_lookup"]
+      },
+      {
+        "phrase": "Chini ka wholesale rate kya hai?",
+        "language": "hi-en",
+        "tests": ["hindi_alias"]
+      },
+      {
+        "phrase": "Jeelakarra konna rate entha?",
+        "language": "te-en",
+        "tests": ["telugu_alias"]
+      }
+    ],
+    "send_whatsapp_reminder": [
+      {
+        "phrase": "Send WhatsApp reminder to Sharma ji",
+        "language": "en-IN",
+        "tests": ["draft_only_no_autosend"]
+      },
+      {
+        "phrase": "Sharma g ko WhatsApp pe khata reminder bhejo",
+        "language": "hi-en",
+        "tests": ["phonetic_typo"]
+      },
+      {
+        "phrase": "Ramesh ki WhatsApp reminder pampu",
+        "language": "te-en",
+        "tests": ["telugu_reminder"]
+      }
+    ],
+    "error_and_clarification_cases": [
+      {
+        "phrase": "Add 2 kg sugar to khata",
+        "expected_error": "MISSING_CUSTOMER",
+        "expected_reply": "Which customer's khata should I add this to?"
+      },
+      {
+        "phrase": "Add 2 kg dragonfruit to Sharma ji's khata",
+        "expected_error": "UNKNOWN_PRODUCT",
+        "expected_reply": "I could not find that product in the store catalog. Please repeat the item name."
+      },
+      {
+        "phrase": "Did payment come?",
+        "expected_error": "MISSING_AMOUNT_OR_SENDER",
+        "expected_reply": "Please tell me the sender name and rupee amount to verify."
+      }
+    ]
+  }
+}
