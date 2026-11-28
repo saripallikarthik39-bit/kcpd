@@ -1,10 +1,10 @@
 ﻿import React, { useState } from "react";
 import {
-  FakeReceiptPreview,
-  PaymentEventStatus,
+  type FakeReceiptPreview,
+  type PaymentEventStatus,
   SIMULATOR_PRESETS,
-  UpiApp,
-  UpiSimulationEvent,
+  type UpiApp,
+  type UpiSimulationEvent,
   broadcastSimulatedEvent,
   createFakeScreenshotPreview,
   createSimulatedUpiEvent

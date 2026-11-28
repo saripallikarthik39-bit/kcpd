@@ -1,4 +1,4 @@
-﻿import { UpiSimulationEvent } from "./paymentSimulator";
+﻿import type{ UpiSimulationEvent } from "./paymentSimulator";
 
 export interface PaymentCheckResult {
   outcome: "VERIFIED" | "FRAUD_ALERT" | "FAILED_EVENT" | "UNKNOWN_EVENT";
