@@ -396,7 +396,7 @@ export async function executeVoiceCommand(
     actionType: 'unknown',
     entities: `heard: "${text}" | speaker: ${speakerName}`,
     reply:
-reply:
+
       'Try saying: "Price of Sugar", "2 kg sugar and 2 maggi", "Add 200 to Sharma ji khata", or "Sugar ayipoyindi".',
     speaker: speakerName,
     latencyMs: Math.max(4, Math.round(performance.now() - start)),
