@@ -40,7 +40,7 @@ export function InventoryPanel() {
         .split(',')
         .map((a) => a.trim().toLowerCase())
         .filter(Boolean),
-      unit: form.unit.trim() || 'pack',
+      unit: (form.unit.trim() || 'pack') as Parameters<typeof db.products.add>[0]['unit'],
       selling_price: Number(form.selling_price) || 0,
       wholesale_cost: Number(form.wholesale_cost) || 0,
       stock: Number(form.stock) || 0,
