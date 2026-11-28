@@ -107,6 +107,16 @@ export async function seedDatabase(): Promise<void> {
       low_stock_threshold: 4,
       expiry_date: nextMonth,
     },
+    {
+  name: 'Parle-G',
+  aliases: ['parle', 'parleg', 'biscuit'],
+  unit: 'pack',
+  selling_price: 10,
+  wholesale_cost: 8.5,
+  stock: 50,
+  low_stock_threshold: 10,
+  expiry_date: nextMonth,
+},
   ];
 
   // Fictional demo phone numbers only
