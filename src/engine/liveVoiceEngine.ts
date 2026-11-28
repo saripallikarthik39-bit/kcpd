@@ -8,13 +8,24 @@ export interface VoiceProfile {
   enrolledAt: string;
 }
 
+export interface VoiceBillItem {
+  productId: number;
+  name: string;
+  qty: number;
+  unit: string;
+  price: number;
+  subtotal: number;
+}
+
 export interface VoiceActionResult {
   success: boolean;
-  actionType: 'khata_add' | 'khata_remove' | 'saruku_add' | 'unknown';
+  actionType: 'khata_add' | 'khata_remove' | 'saruku_add' | 'price_check' | 'bill_add' | 'unknown';
   entities: string;
   reply: string;
   speaker: string;
   latencyMs: number;
+  billItems?: VoiceBillItem[];
+  billTotal?: number;
 }
 
 export const SUPPORTED_LANGUAGES = [
@@ -234,7 +245,93 @@ export async function executeVoiceCommand(
       };
     }
   }
+// 1B. CHECK PRICE LOOKUP COMMANDS (English, Hinglish, Telugu, Hindi)
+  const priceKeywords = [
+    'price', 'rate', 'cost', 'how much',
+    'entha', 'entha rate', 'dhara', 'dara',
+    'kitna', 'kitne', 'bhav', 'daam',
+    'ఎంత', 'ధర', 'कितना', 'भाव',
+  ];
+  const isPriceIntent = priceKeywords.some((kw) => lower.includes(kw));
 
+  if (isPriceIntent) {
+    const matchedProduct = products.find((p) => {
+      if (lower.includes(p.name.toLowerCase())) return true;
+      return (p.aliases ?? []).some((a) => lower.includes(a.toLowerCase()));
+    });
+
+    if (matchedProduct) {
+      const reply = `${matchedProduct.name} is ₹${matchedProduct.selling_price} per ${matchedProduct.unit}. Currently ${matchedProduct.stock} ${matchedProduct.unit} in stock.`;
+      logVoiceAudit(speakerName, text, `Price Check: ${matchedProduct.name}`);
+
+      return {
+        success: true,
+        actionType: 'price_check',
+        entities: `intent: priceCheck | item: ${matchedProduct.name} | price: ₹${matchedProduct.selling_price}/${matchedProduct.unit}`,
+        reply,
+        speaker: speakerName,
+        latencyMs: Math.max(4, Math.round(performance.now() - start)),
+      };
+    }
+  }
+
+  // 1C. CHECK VOICE-TO-BILL (MULTI-ITEM LIST & TOTAL CALCULATION)
+  // Example: "2 kg sugar, 2 maggi, 1 milk" or "0.25 kg jeera and 2 maggi"
+  const matchedBillItems: VoiceBillItem[] = [];
+
+  for (const p of products) {
+    if (p.id === undefined) continue;
+    const namesToMatch = [p.name.toLowerCase(), ...(p.aliases ?? []).map((a) => a.toLowerCase())];
+
+    for (const term of namesToMatch) {
+      if (term.length < 2) continue;
+      const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const qtyBefore = lower.match(
+        new RegExp(`(\\d+(?:\\.\\d+)?)\\s*(?:kg|g|l|ltr|liter|litre|pack|packs|pcs|packet)?\\s+${escaped}\\b`)
+      );
+      const qtyAfter = lower.match(
+        new RegExp(`\\b${escaped}\\s+(\\d+(?:\\.\\d+)?)\\s*(?:kg|g|l|ltr|liter|litre|pack|packs|pcs|packet)?`)
+      );
+
+      if (qtyBefore || qtyAfter) {
+        const qty = Number((qtyBefore ?? qtyAfter)![1]);
+        if (qty > 0) {
+          matchedBillItems.push({
+            productId: p.id,
+            name: p.name,
+            qty,
+            unit: p.unit,
+            price: p.selling_price,
+            subtotal: Number((qty * p.selling_price).toFixed(2)),
+          });
+          break;
+        }
+      }
+    }
+  }
+
+  if (matchedBillItems.length > 0) {
+    const billTotal = Number(
+      matchedBillItems.reduce((sum, item) => sum + item.subtotal, 0).toFixed(2)
+    );
+    const summary = matchedBillItems
+      .map((i) => `${i.qty} ${i.unit} ${i.name} (₹${i.subtotal})`)
+      .join(', ');
+
+    const reply = `Bill ready: ${summary}. Total is ₹${billTotal} (by ${speakerName}).`;
+    logVoiceAudit(speakerName, text, `Voice Bill: ₹${billTotal}`);
+
+    return {
+      success: true,
+      actionType: 'bill_add',
+      entities: `intent: voiceBill | items: ${matchedBillItems.length} | total: ₹${billTotal}`,
+      reply,
+      speaker: speakerName,
+      latencyMs: Math.max(4, Math.round(performance.now() - start)),
+      billItems: matchedBillItems,
+      billTotal,
+    };
+  }
   // 2. CHECK KHATA ADD / REMOVE MONEY COMMANDS
   const amountMatch = lower.match(/(?:₹|rs\.?|rupees?)?\s*(\d+(?:\.\d+)?)/);
   const amount = amountMatch ? Number(amountMatch[1]) : 0;
@@ -299,7 +396,8 @@ export async function executeVoiceCommand(
     actionType: 'unknown',
     entities: `heard: "${text}" | speaker: ${speakerName}`,
     reply:
-      'Try saying: "Add 200 to Sharma ji khata", "Remove 100 from Sharma ji", or "Sugar ayipoyindi" / "Oil finished".',
+reply:
+      'Try saying: "Price of Sugar", "2 kg sugar and 2 maggi", "Add 200 to Sharma ji khata", or "Sugar ayipoyindi".',
     speaker: speakerName,
     latencyMs: Math.max(4, Math.round(performance.now() - start)),
   };
