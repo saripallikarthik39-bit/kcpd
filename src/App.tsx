@@ -18,6 +18,7 @@ import {
   Sparkles,
   Info,
   ChevronRight,
+  ShoppingBag,
 } from 'lucide-react';
 import { db, initDatabaseWithRecovery } from './db/database';
 import { seedDatabase, resetAndReseed } from './db/seed';
@@ -31,10 +32,12 @@ import { KhataPanel } from './components/KhataPanel';
 import { WholesaleCard } from './components/WholesaleCard';
 import { TiltCard3D } from './components/TiltCard3D';
 import { InventoryPanel } from './components/InventoryPanel';
+import { SarukuListPanel } from './components/SarukuListPanel';
 
 type PageId =
   | 'home'
   | 'voice-orb'
+  | 'saruku'
   | 'quick-bill'
   | 'khata'
   | 'shelf-3d'
@@ -128,6 +131,24 @@ export function App() {
     border: string;
   }[] = [
     {
+      id: 'voice-orb',
+      title: '3D Voice Co-Pilot',
+      subtitle: 'Live multilingual mic for Khata, Saruku & trusted staff voices',
+      stat: 'Live Mic',
+      icon: Mic,
+      gradient: 'from-orange-500/20 via-amber-500/10 to-transparent',
+      border: 'border-orange-500/35 hover:border-orange-400',
+    },
+    {
+      id: 'saruku',
+      title: 'Saruku (Restock) List',
+      subtitle: 'Auto-filled when you say "item ayipoyindi" or "out of stock"',
+      stat: `${lowStockCount} To Bring`,
+      icon: ShoppingBag,
+      gradient: 'from-rose-500/25 via-amber-500/10 to-transparent',
+      border: 'border-rose-500/40 hover:border-rose-400',
+    },
+    {
       id: 'quick-bill',
       title: 'Quick Bill POS',
       subtitle: 'Counter A / B billing with instant Cash, UPI & Khata',
@@ -171,15 +192,6 @@ export function App() {
       icon: ShieldCheck,
       gradient: 'from-emerald-500/20 via-lime-500/10 to-transparent',
       border: 'border-emerald-500/35 hover:border-emerald-400',
-    },
-    {
-      id: 'voice-orb',
-      title: '3D Voice Co-Pilot',
-      subtitle: 'Interactive 3D particle orb & live Hinglish pipeline',
-      stat: '6 Demo Chips',
-      icon: Mic,
-      gradient: 'from-orange-500/20 via-amber-500/10 to-transparent',
-      border: 'border-orange-500/35 hover:border-orange-400',
     },
     {
       id: 'wholesale',
@@ -286,7 +298,7 @@ export function App() {
           <div className="rounded-xl border border-amber-500/20 bg-zinc-900/70 p-3 text-[11px] text-stone-400">
             <p className="font-semibold text-amber-300">Offline-First Ready</p>
             <p className="mt-0.5 text-[10px] text-stone-500">
-              All billing, Khata & UPI checks run locally in IndexedDB.
+              All billing, Khata, Saruku &amp; voice logs run locally in IndexedDB.
             </p>
           </div>
         </aside>
@@ -412,7 +424,7 @@ export function App() {
                                 className={`group flex h-full w-full flex-col justify-between rounded-2xl border bg-gradient-to-br ${mod.gradient} bg-zinc-950/75 p-5 text-left backdrop-blur-xl transition-all ${mod.border}`}
                               >
                                 <div className="flex w-full items-start justify-between">
-                                  <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-white/10 bg-zinc-900/90 text-amber-300 group-hover:scale-105 transition-transform">
+                                  <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-white/10 bg-zinc-900/90 text-amber-300 transition-transform group-hover:scale-105">
                                     <Icon className="h-5 w-5" />
                                   </div>
                                   <span className="font-mono-num rounded-full border border-white/10 bg-zinc-900/90 px-2.5 py-1 text-[11px] font-semibold text-stone-200">
@@ -421,7 +433,7 @@ export function App() {
                                 </div>
 
                                 <div className="mt-4">
-                                  <h4 className="text-base font-bold text-white group-hover:text-amber-300 transition-colors">
+                                  <h4 className="text-base font-bold text-white transition-colors group-hover:text-amber-300">
                                     {mod.title}
                                   </h4>
                                   <p className="mt-1 text-xs text-stone-400">
@@ -446,11 +458,11 @@ export function App() {
                 {activePage === 'voice-orb' && (
                   <VoiceOrb3D
                     audioMode={audioMode}
-                    onCommandSubmit={(cmd) =>
-                      setBannerMsg(`Previewed voice command: "${cmd}"`)
-                    }
+                    onCommandSubmit={(msg) => setBannerMsg(msg)}
                   />
                 )}
+
+                {activePage === 'saruku' && <SarukuListPanel />}
 
                 {activePage === 'quick-bill' && (
                   <TiltCard3D>
